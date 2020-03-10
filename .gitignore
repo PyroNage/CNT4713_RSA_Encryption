@@ -1,0 +1,6 @@
+# User-specific stuff
+.idea/
+# Project-specific files
+__pycache__/
+test.db
+config.py

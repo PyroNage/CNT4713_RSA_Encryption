@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Encryption Form for CNT471</title>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <h1 style="text-align: center">Encryption Form</h1>
+
+    <table>
+        <tr>
+            <th>Input</th>
+            <th>Output</th>
+            <th>Decrypted Output</th>
+        </tr>
+        <!--
+        {% for user in users %}
+            <tr>
+                <td>{{ user[1] }}</td>
+                <td>{{ user[2] }}</td>
+                <td>{{ user[0] }}</td>
+                <td>{{ user[3] }}</td>
+                <td>
+                    <a href="/delete/{{ user[0] }}">Delete</a>
+                </td>
+            </tr>
+        {% endfor %}
+        -->
+    </table>
+
+    <form action="/encrypt" name="encrypt" method="POST">
+        Plain Text: <input type="text" name="plainText" id="plainText"><br>
+        <input type="submit" name="encrypt" value="Encrypt"><br>
+    </form>
+    <form action="/decrypt" name="encrypt" method="POST">
+        Cipher Text: <input type="text" name="cipherText" id="cipherText"><br>
+        <input type="submit" name="decrypt" value="Decrypt"><br>
+    </form>
+</div>
+{% endblock %}
