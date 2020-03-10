@@ -4,23 +4,11 @@
 # redirect is for redirecting to different (or the same) route
 from flask import Flask, render_template, url_for, request, redirect
 
-# Import random for the RSA Encryption
-import random
-
 # Defining flask app name
 app = Flask(__name__)
 
-# Example for getting form data:
-# insert_table_query = "INSERT INTO %s (email, firstName, lastName, age) VALUES ('%s', '%s', '%s', '%s');" % (
-#   "userTable", request.form['email'], request.form['firstName'], request.form['lastName'],
 
-# Initializing values for global scope variables
-plainTextValue = ''
-cipherTextValue = ''
-decipheredTextValue = ''
-
-
-# Code to encrypt will be placed here
+# ------- Code to encrypt will be placed here --------
 
 # Algorithm from: https://crypto.stackexchange.com/questions/19444/rsa-given-q-p-and-e
 # Algorithm takes in e and phi_of_n respectively and returns d
@@ -34,6 +22,7 @@ def egcd(a, b):
     return x
 
 
+# Function to encrypt a string using the pk object and RSA logic
 def encrypt(pk, plaintext):
     # Unpack the key into it's components
     key, n = pk
@@ -43,6 +32,7 @@ def encrypt(pk, plaintext):
     return cipher
 
 
+# Function to join together the list of strings after they've been encrypted
 def join_encrypted(ciphertext):
     # Generate the string using the values of the ciphertext list
     plain = [chr(char) for char in ciphertext]
@@ -50,6 +40,7 @@ def join_encrypted(ciphertext):
     return ''.join(plain)
 
 
+# Function to decrypt a string using the pk object and RSA logic
 def decrypt(pk, ciphertext):
     # Unpack the key into its components
     key, n = pk
@@ -69,45 +60,44 @@ d = egcd(e, phi_of_n)           # find d from e * d mod phi_of_n = 1
 publicKey = (e, n)              # public key tuple of value e and n
 privateKey = (d, n)             # private key tuple of value d and n
 
+# ---------- End of code to encrypt --------------
 
 # Main Route, defining the ability to make GET and POST requests to this main route
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/', methods=['GET'])
 def index():
-    if request.method == 'POST':
-        # Print statement to check that post request is being received
-        print('POST Request in index page')
-
-        # STILL INSIDE THE IF POST -- Try to do this action
-        try:
-            print('We successfully processed the POST request. Here is the Data: %s' % plainTextValue)
-            return redirect('/')
-
-        # If there's an error run the code below
-        except:
-            return 'There was an issue adding your user.'
-
-    # If the request is NOT a POST (so if the request is a GET)
+    # If there are messages in the request (Look at the url while in index after making a request)
+    if 'messages' in request.args:
+        # Create a list of lists which will be used to show in the table in index
+        encrypted_object = [request.args.getlist('messages')]
     else:
-        # return render_template('index.html', users=items)only showing this code to show how to pass parameters to html
-
-        return render_template('index.html')
+        # Create an empty list since we have no messages in request.args
+        encrypted_object = []
+    return render_template('index.html', encrypted_object=encrypted_object)
 
 
 # If the user clicks on the encrypt form, the app makes a post request to this route
 @app.route('/encrypt', methods=['POST', 'GET'])
 def encrypt_route():
+    # Define the encrypted list of strings using the encrypt function passing it the public key
     encrypted_text = encrypt(publicKey, request.form['plainText'])
-    return 'Encrypted text: %s' % join_encrypted(encrypted_text)
+    # Also define the decrypted text using the decrypt function to build the return object
+    decrypted_text = decrypt(privateKey, encrypted_text)
+
+    # This is the object we return, it's a list since we use the index positions to show in the table in index.html
+    built_object = [request.form['plainText'], join_encrypted(encrypted_text), decrypted_text]
+    return redirect(url_for('.index', messages=built_object))
 
 
 # If the user clicks on the decrypt form, the app makes a post request to this route
 @app.route('/decrypt', methods=['POST', 'GET'])
 def decrypt_route():
+    # Define the decrypted text using the decrypt function to build the return object
     decrypted_text = encrypt(privateKey, request.form['cipherText'])
-    return 'Decrypted text: %s' % join_encrypted(decrypted_text)
 
+    # This is the object we return, it's a list since we use the index positions to show in the table in index.html
+    built_object = ['Not Applicable!', request.form['cipherText'], join_encrypted(decrypted_text)]
+    return redirect(url_for('.index', messages=built_object))
 
-# @app.route('/delete/<string:email>') Showing this to show how to pass parameters to the route
 
 # Running flask app
 if __name__ == '__main__':

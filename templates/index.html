@@ -10,23 +10,17 @@
 
     <table>
         <tr>
-            <th>Input</th>
-            <th>Output</th>
+            <th>PlainText</th>
+            <th>CipherText</th>
             <th>Decrypted Output</th>
         </tr>
-        <!--
-        {% for user in users %}
+        {% for object in encrypted_object %}
             <tr>
-                <td>{{ user[1] }}</td>
-                <td>{{ user[2] }}</td>
-                <td>{{ user[0] }}</td>
-                <td>{{ user[3] }}</td>
-                <td>
-                    <a href="/delete/{{ user[0] }}">Delete</a>
-                </td>
+                <td>{{ object[0] }}</td>
+                <td>{{ object[1] }}</td>
+                <td>{{ object[2] }}</td>
             </tr>
         {% endfor %}
-        -->
     </table>
 
     <form action="/encrypt" name="encrypt" method="POST">
