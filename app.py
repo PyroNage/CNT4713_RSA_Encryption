@@ -4,6 +4,8 @@
 # redirect is for redirecting to different (or the same) route
 from flask import Flask, render_template, url_for, request, redirect
 
+# Importing for hosting to heroku
+import os
 # Defining flask app name
 app = Flask(__name__)
 
@@ -101,4 +103,6 @@ def decrypt_route():
 
 # Running flask app
 if __name__ == '__main__':
-    app.run()
+    # app.run() ----- THIS WAS FOR LOCAL RUN
+    port = int(os.environ.get('PORT', 33507))
+    app.run(host='0.0.0.0', port=port)
